@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PP GAMES – Friends & Social</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body {
+      background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .social-container {
+      background: rgba(20, 25, 35, 0.95);
+      border: 2px solid #00c8ff;
+      border-radius: 20px;
+      padding: 20px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 0 30px rgba(0, 200, 255, 0.2);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .header h2 { color: #00c8ff; font-size: 1.3rem; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08); color: #aaa; font-weight: bold; cursor: pointer;
+    }
+    .tab-btn.active { background: #00c8ff; color: #000; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Search Box */
+    .search-box { display: flex; gap: 8px; margin-bottom: 15px; }
+    .search-box input {
+      flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #333;
+      background: #111; color: #fff; outline: none;
+    }
+    .btn-search { background: #ffd700; color: #000; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+    /* List Items */
+    .user-card {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255, 255, 255, 0.05); padding: 10px 12px;
+      border-radius: 10px; margin-bottom: 8px; border: 1px solid #333;
+    }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .user-avatar { font-size: 1.5rem; }
+    .user-name { font-weight: bold; }
+    .user-id-tag { font-size: 0.75rem; color: #888; }
+    
+    .action-btn {
+      padding: 6px 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;
+    }
+    .btn-add { background: #00ff88; color: #000; }
+    .btn-play { background: #ffd700; color: #000; }
+    .btn-accept { background: #00ff88; color: #000; margin-right: 5px; }
+    .btn-reject { background: #ff4d4d; color: #fff; }
+
+    .btn-back {
+      width: 100%; padding: 10px; margin-top: 15px;
+      background: transparent; border: 1px solid #e74c3c; color: #e74c3c;
+      border-radius: 8px; font-weight: bold; cursor: pointer;
+    }
+    .empty-msg { text-align: center; color: #777; padding: 20px; font-size: 0.9rem; }
+    #toast {
+      position: fixed; bottom: 20px; background: #222; border: 1px solid #00c8ff;
+      color: #fff; padding: 10px 20px; border-radius: 20px; display: none; z-index: 1000;
+    }
+
+    /* 📊 MINI SKILL BARS CONTAINER */
+    .mini-skills-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      margin-top: 6px;
+      width: 170px;
+    }
+    .mini-skill-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .mini-skill-label {
+      font-size: 0.6rem;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .mini-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .mini-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .fill-atk { background: #ff4d4d; }  /* Attack - Red */
+    .fill-def { background: #00c8ff; }  /* Defense - Blue */
+    .fill-str { background: #ffd700; }  /* Strategy - Gold */
+    .fill-spd { background: #00ff88; }  /* Speed - Green */
+    .fill-acc { background: #bf55ec; }  /* Accuracy - Purple */
+  </style>
+</head>
+<body>
+
+<div class="social-container">
+  <div class="header">
+    <h2>👥 Friends & Social</h2>
+    <span id="myIdDisplay" style="font-size: 0.8rem; color:#ffd700;">My ID: ---</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('friendsTab', this)">Friends</button>
+    <button class="tab-btn" onclick="switchTab('addTab', this)">Add Friend</button>
+    <button class="tab-btn" onclick="switchTab('requestsTab', this)">Requests <span id="reqBadge"></span></button>
+  </div>
+
+  <!-- 1. Friends List -->
+  <div id="friendsTab" class="tab-content active">
+    <div id="friendsList"></div>
+  </div>
+
+  <!-- 2. Add Friend -->
+  <div id="addTab" class="tab-content">
+    <div class="search-box">
+      <input type="text" id="searchUidInput" placeholder="Enter Friend's 5-Digit ID...">
+      <button class="btn-search" onclick="searchUser()">Search</button>
+    </div>
+    <div id="searchResult"></div>
+  </div>
+
+  <!-- 3. Requests -->
+  <div id="requestsTab" class="tab-content">
+    <div id="requestsList"></div>
+  </div>
+
+  <!-- Back Button -->
+  <button class="btn-back" onclick="window.location.replace('index.html')">⬅ Back to Game</button>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+  import { app, db } from "./firebase.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { ref, get, set, remove, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  const auth = getAuth(app);
+  let currentUser = null;
+  let myData = null;
+
+  function showMessage(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 2500);
+  }
+
+  window.switchTab = function(tabId, btn) {
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
+    btn.classList.add("active");
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      const snap = await get(ref(db, "users/" + user.uid));
+      if (snap.exists()) {
+        myData = snap.val();
+        document.getElementById("myIdDisplay").innerText = "My ID: " + (myData.playerId || "---");
+      }
+      listenFriends();
+      listenRequests();
+      listenIncomingChallenges();
+    } else {
+      window.location.replace("index.html");
+    }
+  });
+
+  window.searchUser = async function() {
+    const searchId = document.getElementById("searchUidInput").value.trim();
+    const resultBox = document.getElementById("searchResult");
+    resultBox.innerHTML = "Searching... ⏳";
+
+    if (!searchId) {
+      resultBox.innerHTML = "<div class='empty-msg'>Please enter an ID</div>";
+      return;
+    }
+
+    const snap = await get(ref(db, "users"));
+    if (snap.exists()) {
+      const users = snap.val();
+      let foundUser = null;
+      let targetUid = null;
+
+      for (let uid in users) {
+        if (users[uid].playerId === searchId) {
+          foundUser = users[uid];
+          targetUid = uid;
+          break;
+        }
+      }
+
+      if (foundUser) {
+        if (targetUid === currentUser.uid) {
+          resultBox.innerHTML = "<div class='empty-msg'>This is your own ID!</div>";
+          return;
+        }
+
+        resultBox.innerHTML = `
+          <div class="user-card">
+            <div class="user-info">
+              <div class="user-avatar">👤</div>
+              <div>
+                <div class="user-name">${foundUser.username || "Player"}</div>
+                <div class="user-id-tag">ID: ${foundUser.playerId}</div>
+              </div>
+            </div>
+            <button class="action-btn btn-add" onclick="sendFriendRequest('${targetUid}')">➕ Add</button>
+          </div>
+        `;
+      } else {
+        resultBox.innerHTML = "<div class='empty-msg'>No player found with this ID</div>";
+      }
+    }
+  };
+
+  window.sendFriendRequest = async function(targetUid) {
+    await set(ref(db, `friendRequests/${targetUid}/${currentUser.uid}`), {
+      fromUid: currentUser.uid,
+      fromName: myData.username || "Player",
+      fromId: myData.playerId || "---",
+      time: Date.now()
+    });
+    showMessage("Friend Request Sent! ✉️");
+    document.getElementById("searchResult").innerHTML = "";
+    document.getElementById("searchUidInput").value = "";
+  };
+
+  function listenRequests() {
+    onValue(ref(db, `friendRequests/${currentUser.uid}`), (snap) => {
+      const list = document.getElementById("requestsList");
+      const badge = document.getElementById("reqBadge");
+      list.innerHTML = "";
+
+      if (!snap.exists()) {
+        list.innerHTML = "<div class='empty-msg'>No pending requests</div>";
+        badge.innerText = "";
+        return;
+      }
+
+      const data = snap.val();
+      const count = Object.keys(data).length;
+      badge.innerText = count > 0 ? `(${count})` : "";
+
+      for (let senderUid in data) {
+        const req = data[senderUid];
+        const card = document.createElement("div");
+        card.className = "user-card";
+        card.innerHTML = `
+          <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div>
+              <div class="user-name">${req.fromName}</div>
+              <div class="user-id-tag">ID: ${req.fromId}</div>
+            </div>
+          </div>
+          <div>
+            <button class="action-btn btn-accept" onclick="acceptRequest('${senderUid}')">✔</button>
+            <button class="action-btn btn-reject" onclick="rejectRequest('${senderUid}')">✖</button>
+          </div>
+        `;
+        list.appendChild(card);
+      }
+    });
+  }
+
+  window.acceptRequest = async function(senderUid) {
+    await set(ref(db, `friends/${currentUser.uid}/${senderUid}`), true);
+    await set(ref(db, `friends/${senderUid}/${currentUser.uid}`), true);
+    await remove(ref(db, `friendRequests/${currentUser.uid}/${senderUid}`));
+    showMessage("Friend Added! 🎉");
+  };
+
+  window.rejectRequest = async function(senderUid) {
+    await remove(ref(db, `friendRequests/${currentUser.uid}/${senderUid}`));
+    showMessage("Request Rejected");
+  };
+
+  function listenFriends() {
+    onValue(ref(db, `friends/${currentUser.uid}`), async (snap) => {
+      const list = document.getElementById("friendsList");
+      list.innerHTML = "";
+
+      if (!snap.exists()) {
+        list.innerHTML = "<div class='empty-msg'>No friends yet. Add using ID!</div>";
+        return;
+      }
+
+      const friendsData = snap.val();
+      for (let fUid in friendsData) {
+        const userSnap = await get(ref(db, "users/" + fUid));
+        if (userSnap.exists()) {
+          const u = userSnap.val();
+          
+          const atk = Math.min(u.attack || 0, 100);
+          const def = Math.min(u.defense || 0, 100);
+          const str = Math.min(u.strategy || 0, 100);
+          const spd = Math.min(u.speed || 0, 100);
+          const acc = Math.min(u.accuracy || 0, 100);
+
+          const card = document.createElement("div");
+          card.className = "user-card";
+          card.innerHTML = `
+            <div class="user-info">
+              <div class="user-avatar">👤</div>
+              <div>
+                <div class="user-name">${u.username || "Player"}</div>
+                <div class="user-id-tag">ID: ${u.playerId || "---"}</div>
+                
+                <div class="mini-skills-grid">
+                  <div class="mini-skill-item">
+                    <span class="mini-skill-label">ATK</span>
+                    <div class="mini-bar-track"><div class="mini-bar-fill fill-atk" style="width:${atk}%;"></div></div>
+                  </div>
+                  <div class="mini-skill-item">
+                    <span class="mini-skill-label">DEF</span>
+                    <div class="mini-bar-track"><div class="mini-bar-fill fill-def" style="width:${def}%;"></div></div>
+                  </div>
+                  <div class="mini-skill-item">
+                    <span class="mini-skill-label">STR</span>
+                    <div class="mini-bar-track"><div class="mini-bar-fill fill-str" style="width:${str}%;"></div></div>
+                  </div>
+                  <div class="mini-skill-item">
+                    <span class="mini-skill-label">SPD</span>
+                    <div class="mini-bar-track"><div class="mini-bar-fill fill-spd" style="width:${spd}%;"></div></div>
+                  </div>
+                  <div class="mini-skill-item">
+                    <span class="mini-skill-label">ACC</span>
+                    <div class="mini-bar-track"><div class="mini-bar-fill fill-acc" style="width:${acc}%;"></div></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <button class="action-btn btn-play" onclick="challengeFriend('${fUid}')">⚔️ Play</button>
+          `;
+          list.appendChild(card);
+        }
+      }
+    });
+  }
+
+  // ⚔️ Play Together (रूम तयार करून थेट index.html वर जाणे जिथे टायमर दिसेल)
+  window.challengeFriend = async function(targetUid) {
+    const roomsRef = ref(db, "onlineRooms");
+    const newRoom = push(roomsRef);
+    const roomId = newRoom.key;
+
+    const myPlayerData = {
+      uid: currentUser.uid,
+      name: myData.username || "Player",
+      coins: Number(localStorage.getItem("coins")) || 500,
+      diamonds: Number(localStorage.getItem("diamonds")) || 0,
+      flag: (myData.country || "🇮🇳").split(" ")[0],
+      rank: document.getElementById("playerRank")?.innerText || "Bronze",
+      pic: document.getElementById("profilePic")?.src || "default.png"
+    };
+
+    await set(newRoom, {
+      white: myPlayerData,
+      black: null,
+      turn: "white",
+      board: [
+        "♜","♞","♝","♛","♚","♝","♞","♜",
+        "♟","♟","♟","♟","♟","♟","♟","♟",
+        "","","","","","","","",
+        "","","","","","","","",
+        "","","","","","","","",
+        "","","","","","","","",
+        "♙","♙","♙","♙","♙","♙","♙","♙",
+        "♖","♘","♗","♕","♔","♗","♘","♖"
+      ],
+      whiteTime: 30,
+      blackTime: 30,
+      whiteHearts: 3,
+      blackHearts: 3,
+      turnStart: Date.now(),
+      status: "waiting"
+    });
+
+    await set(ref(db, `gameChallenges/${targetUid}/${currentUser.uid}`), {
+      challengerName: myData.username || "Player",
+      challengerUid: currentUser.uid,
+      roomId: roomId,
+      time: Date.now()
+    });
+
+    // 🔥 सेशन्समध्ये सेव्ह करून थेट इंडेक्स पेजवर नेणे
+    sessionStorage.setItem("directRoomId", roomId);
+    sessionStorage.setItem("directColor", "white");
+    
+    window.location.replace("index.html");
+  };
+
+   function listenIncomingChallenges() {
+    onValue(ref(db, `gameChallenges/${currentUser.uid}`), async (snap) => {
+      if (snap.exists()) {
+        const challenges = snap.val();
+        for (let chUid in challenges) {
+          const c = challenges[chUid];
+          
+          // 🔥 ओपोनंटने ऍक्सेप्ट करण्यापूर्वी रूम अस्तित्वात आहे का तपासा
+          const roomCheckSnap = await get(ref(db, `onlineRooms/${c.roomId}`));
+          if (!roomCheckSnap.exists()) {
+            // जर चॅलेंज आधीच कॅन्सल झाले असेल, तर फुकटचा पॉपअप दाखवू नका, थेट नोड उडवून टाका
+            remove(ref(db, `gameChallenges/${currentUser.uid}/${chUid}`));
+            continue;
+          }
+
+          const confirmPlay = confirm(`⚔️ ${c.challengerName} invited you to play a Chess match! Accept?`);
+          if (confirmPlay) {
+            sessionStorage.setItem("directRoomId", c.roomId);
+            sessionStorage.setItem("directColor", "black");
+            await remove(ref(db, `gameChallenges/${currentUser.uid}/${chUid}`));
+            window.location.replace("index.html");
+          } else {
+            await remove(ref(db, `gameChallenges/${currentUser.uid}/${chUid}`));
+            // जर त्याने डिक्लाइन केले, तर ती रूम देखील काढून टाका जेणेकरून समोरच्याचे रूम क्लिन होईल
+            await remove(ref(db, `onlineRooms/${c.roomId}`));
+          }
+          break;
+        }
+      }
+    });
+  }
+
+</script>
+
+</body>
+</html>

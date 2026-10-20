@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PP GAMES – ProChess</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="theme1">
+
+<!-- ================= 👑 TOP PROFILE (NO CHANGE) ================= -->
+<div class="top-profile" id="topProfileBtn">
+  <div class="profile-left">
+    <div class="profile-wrapper">
+      <img id="profilePic" src="default.png">
+    </div>
+  </div>
+  <div class="profile-right">
+    <div class="name-row">
+      <span id="profileFlagTop">🇮🇳</span>
+      <span id="topUsername">Player</span>
+    </div>
+    <div class="money-row">
+      <span class="coinBox">🪙 <span id="coins">0</span></span>
+      <span class="diamondBox">💎 <span id="diamonds">0</span></span>
+    </div>
+    <div class="rank-row">
+      <span id="playerRank">Bronze</span>
+    </div>
+  </div>
+  <div class="rank-badge-wrap">
+    <img id="rankBadge" src="bronze.png">
+  </div>
+</div>
+
+<!-- ================= PROFILE PAGE ================= -->
+<div id="profilePopup" class="profile-page">
+  <div class="profile-card">
+    <button class="close-btn" onclick="closeProfile()">✖</button>
+    <div class="avatar-circle" id="avatarInitial"></div>
+    <h2 id="profileName">Player <span id="profileFlag"></span></h2>
+    <p class="player-id">ID: <span id="playerId">0001</span></p>
+
+    <div class="xp-container">
+      <div class="xp-fill" id="xpBar"></div>
+    </div>
+    <p class="level-text">Level <span id="playerLevel">1</span></p>
+    <p id="xpText">0 / 100 XP</p>
+
+    <div class="career-box">
+      <h3>🏆 Online Career</h3>
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-number" id="winsCount">0</span>
+          <span class="stat-label">Wins</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="lossCount">0</span>
+          <span class="stat-label">Loss</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skill">
+      <span>Attack</span>
+      <div class="bar"><div id="attackBar" class="fill"></div></div>
+      <span id="attackText">0%</span>
+    </div>
+    <div class="skill">
+      <span>Defense</span>
+      <div class="bar"><div id="defenseBar" class="fill"></div></div>
+      <span id="defenseText">0%</span>
+    </div>
+    <div class="skill">
+      <span>Strategy</span>
+      <div class="bar"><div id="strategyBar" class="fill"></div></div>
+      <span id="strategyText">0%</span>
+    </div>
+    <div class="skill">
+      <span>Speed</span>
+      <div class="bar"><div id="speedBar" class="fill"></div></div>
+      <span id="speedText">0%</span>
+    </div>
+    <div class="skill">
+      <span>Accuracy</span>
+      <div class="bar"><div id="accuracyBar" class="fill"></div></div>
+      <span id="accuracyText">0%</span>
+    </div>
+
+    <div class="profile-actions">
+      <button class="edit-btn" id="editBtn" onclick="openEditProfile()">Edit</button>
+      <button class="logout-btn" onclick="logoutUser()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= EDIT PROFILE MODAL ================= -->
+<!-- ================= EDIT PROFILE MODAL ================= -->
+<div id="editModal" class="modal" style="display:none;">
+  <div class="modalBox">
+    <h2>Edit Profile</h2>
+    <input type="text" id="editUsername" placeholder="Username">
+
+    <!-- 🔒 DOB Lock: बदल करता येणार नाही -->
+    <input type="date" id="editDob" disabled style="opacity: 0.55; cursor: not-allowed; pointer-events: none; background: #080c14 !important;" title="Date of Birth cannot be changed">
+
+    <!-- 🔒 Email Lock: बदल करता येणार नाही -->
+    <input type="email" id="editEmail" placeholder="E-mail" readonly disabled style="opacity: 0.55; cursor: not-allowed; pointer-events: none; background: #080c14 !important;" title="Email cannot be changed">
+
+
+    <input type="tel" id="editPhone" placeholder="Phone Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+    <select id="editCountry">
+      <option value="🇮🇳 India">🇮🇳 India</option>
+      <option value="🇺🇸 USA">🇺🇸 USA</option>
+      <option value="🇬🇧 UK">🇬🇧 UK</option>
+      <option value="🇧🇷 Brazil">🇧🇷 Brazil</option>
+      <option value="🇷🇺 Russia">🇷🇺 Russia</option>
+      <option value="🇨🇳 China">🇨🇳 China</option>
+      <option value="🇯🇵 Japan">🇯🇵 Japan</option>
+      <option value="🇰🇷 Korea">🇰🇷 Korea</option>
+      <option value="🇵🇭 Philippines">🇵🇭 Philippines</option>
+      <option value="🇮🇩 Indonesia">🇮🇩 Indonesia</option>
+      <option value="🇹🇭 Thailand">🇹🇭 Thailand</option>
+      <option value="🇻🇳 Vietnam">🇻🇳 Vietnam</option>
+      <option value="🇲🇾 Malaysia">🇲🇾 Malaysia</option>
+      <option value="🇸🇬 Singapore">🇸🇬 Singapore</option>
+      <option value="🇦🇺 Australia">🇦🇺 Australia</option>
+      <option value="🇨🇦 Canada">🇨🇦 Canada</option>
+      <option value="🇦🇪 UAE">🇦🇪 UAE</option>
+    </select>
+    <button id="saveProfile" class="pro-btn gold" onclick="saveProfile()">Save</button>
+    <button id="closeEdit" class="pro-btn red" onclick="closeEditProfile()">Close</button>
+  </div>
+</div>
+
+
+<!-- ================= SPLASH ================= -->
+<div id="splash">
+  <video id="splashVideo" autoplay playsinline>
+    <source src="splash-logo.mp4" type="video/mp4">
+  </video>
+  <div id="loaderBox">
+    <div id="loader"></div>
+  </div>
+</div>
+
+<!-- ================= ⚔️ EXACT DRAWING MATCH HEADER ================= -->
+<div id="matchHeader" class="match-header" style="display:none; position: relative;">
+  
+  <!-- 🔥 Match Header chya Center la Mic ani Video Call Buttons -->
+  
+  <!-- 👤 Opponent Side (Left) -->
+  <div class="match-player-side left-side">
+    <div class="avatar-column">
+      <div class="opponent-avatar-wrap">
+        <img id="matchOpponentPic" src="default.png" alt="Opponent">
+        <!-- 🔥 Opponent Live Video Tag -->
+        <video id="remoteVideo" autoplay playsinline style="position: absolute; inset: 0; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #00f2ff;"></video>
+        <div class="chat-icon-mini" onclick="toggleChat()" title="Chat">💬</div>
+        <div class="add-friend-badge" id="addMatchFriendBtn" onclick="addCurrentOpponentAsFriend()" title="Add Friend">➕</div>
+      </div>
+      <div id="opponentHearts" class="hearts-box">
+        <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+      </div>
+    </div>
+
+    <div class="player-details">
+      <div class="name-row">
+        <span id="matchOpponentFlag">🇮🇳</span>
+        <span id="matchOpponentName">Opponent</span>
+      </div>
+      <div class="money-row">
+        <div class="money-item">🪙 <span id="matchOpponentCoins">0</span></div>
+        <div class="money-item">💎 <span id="matchOpponentDiamonds">0</span></div>
+      </div>
+      <div class="rank-row"><span id="matchOpponentRank">Bronze</span></div>
+      <div class="header-center-controls">
+    <div class="control-badge-btn" id="micBtn" title="Toggle Mic">🎤</div>
+    <div class="control-badge-btn" id="videoCallBtn" title="Toggle Video Call">📹</div>
+  </div>
+
+    </div>
+
+    <div class="timer-circle">
+      <svg width="38" height="38">
+        <circle cx="19" cy="19" r="15" stroke="#222" stroke-width="3.5" fill="none"/>
+        <circle id="opponentTimerCircle" cx="19" cy="19" r="15" stroke="lime" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="94" stroke-dashoffset="0"/>
+      </svg>
+      <span id="opponentTimerText">30</span>
+    </div>
+  </div>
+
+  <!-- ⚔️ VS Badge -->
+  <div class="vs-text">VS</div>
+
+  <!-- 👤 My Side (Right) -->
+  <div class="match-player-side right-side">
+    <div class="timer-circle">
+      <svg width="38" height="38">
+        <circle cx="19" cy="19" r="15" stroke="#222" stroke-width="3.5" fill="none"/>
+        <circle id="myTimerCircle" cx="19" cy="19" r="15" stroke="lime" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="94" stroke-dashoffset="0"/>
+      </svg>
+      <span id="myTimerText">30</span>
+    </div>
+
+    <div class="player-details right-details">
+      <div class="name-row">
+        <span id="matchMyFlag">🇮🇳</span>
+        <span id="matchMyName">You</span>
+      </div>
+      <div class="rank-row"><span id="matchMyRank">Bronze</span></div>
+    </div>
+
+    <div class="avatar-column">
+      <div class="my-avatar-wrap">
+        <img id="matchMyPic" src="default.png" alt="You">
+        <!-- 🔥 Swatchaa Live Video Tag -->
+        <video id="localVideo" autoplay playsinline muted style="position: absolute; inset: 0; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #00ff88; transform: scaleX(-1);"></video>
+      </div>
+      <div id="myHearts" class="hearts-box">
+        <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+      </div>
+    </div>
+    
+    <div id="soundToggleBtn" onclick="toggleTimerSound()" class="sound-icon-mini" title="Mute/Unmute Timer Sound">🔊</div>
+    <audio id="remoteAudio" autoplay playsinline></audio>
+  </div>
+</div>
+
+
+<!-- 🏳️ RESIGN BUTTON -->
+<!-- 🏳️ RESIGN & VIDEO CALL EXIT BUTTONS -->
+<div id="onlineActionBar" class="online-action-bar" style="display:none;">
+  <button class="match-resign-btn" onclick="exitOnlineMatch()">🏳️ Resign / Exit Match</button>
+  <button id="exitCallBtn" class="match-resign-btn" style="display:none; background: linear-gradient(135deg, #ff9900, #cc6600); border-color: #ffaa00;" onclick="endVideoCall()">📴 End Video Call</button>
+</div>
+
+
+<!-- 📹 Big Live Video Stream Boxes (Suruvatila home var disnar nahi) -->
+<div id="liveVideoContainer" class="live-video-grid" style="display:none !important;">
+   <div class="live-video-box">
+    <video id="remoteBigVideo" autoplay playsinline></video>
+    <div class="live-badge">🔴 LIVE (Opponent)</div>
+  </div>
+  <div class="live-video-box">
+    <video id="myBigVideo" autoplay playsinline muted></video>
+    <div class="live-badge">🔴 LIVE (You)</div>
+  </div>
+</div>
+
+<!-- 💬 LIVE CHAT BUBBLES -->
+<div id="oppLiveBubbleContainer" style="position:fixed; top:130px; left:15px; z-index:9999; display:flex; flex-direction:column; align-items:flex-start; pointer-events:none;"></div>
+<div id="myLiveBubbleContainer" style="position:fixed; top:130px; right:15px; z-index:9999; display:flex; flex-direction:column; align-items:flex-end; pointer-events:none;"></div>
+
+<!-- ================= MATCH CHAT ================= -->
+<div id="matchChat" class="chatBox" style="display:none;">
+  <div class="chatHeader">
+    <span>💬 Chat</span>
+    <button onclick="closeChat()">✖</button>
+  </div>
+  <div id="chatMessages" class="chatMessages"></div>
+  <div class="chatInputBox">
+    <input id="chatInput" placeholder="Type message..." />
+    <button id="sendBtn">➤</button>
+  </div>
+</div>
+
+<!-- ================= OFFLINE CONTROLS ================= -->
+<div class="controls" id="offlineControls">
+  <div class="btn-row-1">
+    <button id="buyCoinBtn" class="neon-btn green" onclick="openCoinShop()">🪙 Buy Coins</button>
+    <button id="modeBtn" class="neon-btn purple" onclick="toggleMode()">Bot vs player</button>
+   
+    <button id="undoBtn" class="neon-btn gold" onclick="undoMove()">↩ Undo</button>
+     <button id="sideBtn" class="neon-btn red" onclick="toggleSide()">⚪ White</button>
+  </div>
+  <div class="btn-row-2">
+    <button id="settingsBtn" class="neon-btn silver" onclick="openSettings()">⚙ Settings</button>
+    <button id="playOnlineBtn" class="neon-btn blue"> 🌎 Play Online</button>
+  </div>
+</div>
+
+<!-- ================= BOARD ================= -->
+<div id="board" class="board"></div>
+
+<!-- ================= ONLINE POPUP ================= -->
+<!-- ================= 🪙 ENTRY FEE SELECTION POPUP ================= -->
+<div id="entryFeePopup" class="popup" style="display:none;">
+  <div class="popup-box" style="max-width: 340px;">
+    <h3 style="color: #ffd700; margin-bottom: 12px;">🎯 Select Entry Fee</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
+      <button class="pro-btn gold" onclick="selectEntryFee(50)">50 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(100)">100 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(200)">200 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(500)">500 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(1000)">1K 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(2000)">2K 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(5000)">5K 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(10000)">10K 🪙</button>
+      <button class="pro-btn gold" onclick="selectEntryFee(20000)">20K 🪙</button>
+    </div>
+    <button class="pro-btn red" onclick="closeEntryFeePopup()">❌ Cancel</button>
+  </div>
+</div>
+
+<div id="onlinePopup" class="popup">
+  <div class="popup-box">
+    <div id="connectStatus">Waiting for opponent... ⏳</div>
+    <button id="cancelOnline" class="pro-btn red">❌ Cancel</button>
+  </div>
+</div>
+
+
+<!-- ================= SETTINGS MODAL ================= -->
+<!-- ================= SETTINGS MODAL ================= -->
+<div id="settings" class="modal">
+  <div class="modalBox">
+    <h2>⚙ Settings</h2>
+    <div></div>
+    
+    <!-- Settings Modal मधील बटन्सची यादी -->
+    <button class="pro-btn gold" onclick="addTestDiamonds(50000)">💎 Test: Add 50 Diamonds</button>
+
+    <button class="pro-btn silver" onclick="openTheme()">🎨 Theme</button>
+    <button class="pro-btn silver" onclick="toggleSound(this)">🔊 Sound</button>
+    
+    <!-- 🔥 नवीन BG Music Toggle बटण इथे ॲड केले आहे -->
+    <button class="pro-btn silver" id="bgMusicToggleBtn" onclick="toggleBgMusic()">🎵 BG Music: ON</button>
+
+    <button class="pro-btn silver" onclick="restart()">⟳ Restart</button>
+    <button class="pro-btn red" onclick="closeSettings()">❌ Close</button>
+  </div>
+</div>
+
+
+<!-- ================= LOGO & BOTTOM NAV ================= -->
+<div id="gameLogo">♛PROCHESS♛</div>
+
+
+
+<div class="bottom-nav">
+  <button class="nav-btn gold-glow" onclick="openLeaderboard()">
+    <span class="nav-icon">🏆</span>
+    <span class="nav-label">Leaderboard</span>
+  </button>
+  
+  <!-- 👥 Friends (Guest असेल तर अडवेल) -->
+  <button class="nav-btn blue-glow" onclick="openFriendsPage()">
+    <span class="nav-icon">👥</span>
+    <span class="nav-label">Friends</span>
+  </button>
+  
+  <!-- 🎁 Rewards (Guest असेल तर अडवेल) -->
+  <button class="nav-btn green-glow" onclick="openRewardsPage()">
+    <span class="nav-icon">🎁</span>
+    <span class="nav-label">Rewards</span>
+  </button>
+  <!-- 🧩 नवीन Puzzles सेक्शन बटण -->
+  <button class="nav-btn purple-glow" onclick="window.location.replace('puzzles.html')">
+    <span class="nav-icon">🧩</span>
+    <span class="nav-label">Puzzles</span>
+  </button>
+  
+
+</div>
+
+
+<!-- ⚔️ FRIEND CHALLENGE MODAL -->
+<div id="friendInviteModal" class="custom-invite-modal" style="display:none;">
+  <div class="custom-invite-box">
+    <div class="invite-icon-anim">⚔️</div>
+    <h3 id="inviteChallengerName">Friend</h3>
+    <p>has challenged you to a Chess match!</p>
+    <div class="invite-actions">
+      <button class="invite-btn accept-btn" id="acceptInviteBtn">✔ Accept</button>
+      <button class="invite-btn reject-btn" id="rejectInviteBtn">✖ Decline</button>
+    </div>
+  </div>
+</div>
+
+<!-- ⏳ FRIEND WAITING POPUP -->
+<div id="friendWaitingPopup" class="popup">
+  <div class="popup-box">
+    <div style="font-size: 2rem; margin-bottom: 8px;">⏳</div>
+    <h3 style="color: #00c8ff; margin-bottom: 5px;">Waiting for Friend...</h3>
+    <p id="friendWaitingTimer" style="font-size: 1.1rem; color: #ffd700; font-weight: bold; margin-bottom: 15px;">20s</p>
+    <button class="pro-btn red" onclick="cancelFriendWaiting()">❌ Cancel Challenge</button>
+  </div>
+</div>
+
+<!-- ================= POPUP & LOGIN ================= -->
+<div id="popup" class="popup">
+  <div class="popup-box">
+    <div id="popupText">TEXT</div>
+    <button onclick="closePopup()">OK</button>
+  </div>
+</div>
+
+
+
+<!-- ================= LOGIN OVERLAY ================= -->
+<!-- ================= LOGIN OVERLAY ================= -->
+<div class="login-overlay" id="loginOverlay" style="display: none !important;">
+  <div class="login-box">
+    <h2>PROCHESS LOGIN</h2>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Enter the Chess world</p>
+    
+    <!-- 1. Google Login -->
+    <button class="cyber-btn google-btn" id="googleLoginBtn" onclick="loginWithGoogle()">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.18 21.31 7.22 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.19C.43 8.14 0 9.88 0 12s.43 3.86 1.19 5.39l3.08-2.39z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.18 2.69 1.19 6.61l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
+      </svg>
+      <span>Login with Google</span>
+    </button>
+
+    <!-- 2. ✉️ Email Login Button (थेट ग्लोबल फंक्शनने उघडेल) -->
+    <button type="button" class="cyber-btn email-btn" onclick="openEmailLoginModal()" style="margin-top: 10px; background: rgba(0, 200, 255, 0.15); border: 1.5px solid #00c8ff; color: #00c8ff; font-weight: bold; border-radius: 12px; padding: 12px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <span>✉️ Login with Email</span>
+    </button>
+
+    <!-- 3. 👤 Guest Login (पूर्ण स्वतंत्र गेस्ट लॉगिन) -->
+    
+
+    <!-- 4. Create Account -->
+    <a href="register.html" class="small-link" style="text-decoration: underline; color: #00c8ff; margin-top: 15px; display: inline-block;">Create New Account</a>
+  </div>
+</div>
+
+<!-- 📧 Email Login Popup Modal -->
+<div id="emailLoginModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999999; align-items: center; justify-content: center;">
+  <div class="modalBox" style="background: #0d1524; padding: 22px; border-radius: 16px; border: 1.5px solid #00c8ff; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 0 25px rgba(0, 200, 255, 0.3);">
+    <h2 style="color: #00c8ff; margin-bottom: 14px; font-size: 1.2rem;">Email Login</h2>
+    
+    <!-- 🛑 onsubmit काढून टाकला आहे -->
+    <div>
+      <input type="email" id="loginUserEmail" placeholder="Enter Registered Email" required style="width: 100%; padding: 11px; margin-bottom: 12px; border-radius: 8px; border: 1.5px solid #1f2d42; background: #101826; color: #fff; outline: none; box-sizing: border-box;">
+      <input type="password" id="loginUserPassword" placeholder="Enter Password" required style="width: 100%; padding: 11px; margin-bottom: 16px; border-radius: 8px; border: 1.5px solid #1f2d42; background: #101826; color: #fff; outline: none; box-sizing: border-box;">
+      
+      <!-- ✅ थेट onclick वापरला आहे -->
+      <button type="button" id="btnEmailLoginSubmit" onclick="handleEmailLogin()" style="width: 100%; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #00c8ff, #0072ff); color: #fff; font-weight: bold; cursor: pointer; border: none; font-size: 0.95rem;">Login</button>
+      <button type="button" onclick="closeEmailLoginModal()" style="width: 100%; padding: 10px; border-radius: 10px; background: rgba(239, 68, 68, 0.2); color: #ef4444; font-weight: bold; cursor: pointer; border: 1px solid #ef4444; margin-top: 8px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="cropModal" class="crop-modal" style="display:none;">
+  <div class="crop-box">
+    <h3>Crop Profile Photo</h3>
+    <img id="cropImage">
+    <div class="crop-actions">
+      <button id="cropSave">✔ Crop & Save</button>
+      <button id="cropCancel">✖ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="themePopup" class="theme-popup">
+  <div class="theme-box">
+    <h2>🎨 Choose Your Theme</h2>
+    <div class="theme-grid">
+      <div class="theme-item theme1" onclick="setTheme('theme1')"><div class="theme-preview"></div><span>Royal Blue</span></div>
+      <div class="theme-item theme2" onclick="setTheme('theme2')"><div class="theme-preview"></div><span>Dark Knight</span></div>
+      <div class="theme-item theme3" onclick="setTheme('theme3')"><div class="theme-preview"></div><span>Emerald Glow</span></div>
+      <div class="theme-item theme4" onclick="setTheme('theme4')"><div class="theme-preview"></div><span>Crimson Fire</span></div>
+      <div class="theme-item theme5" onclick="setTheme('theme5')"><div class="theme-preview"></div><span>Forest Elite</span></div>
+      <div class="theme-item theme6" onclick="setTheme('theme6')"><div class="theme-preview"></div><span>Brown Cyber</span></div>
+      <div class="theme-item theme7" onclick="setTheme('theme7')"><div class="theme-preview"></div><span>Midnight Purple</span></div>
+      <div class="theme-item theme8" onclick="setTheme('theme8')"><div class="theme-preview"></div><span>Ocean Breeze</span></div>
+      <div class="theme-item theme9" onclick="setTheme('theme9')"><div class="theme-preview"></div><span>Ice Glow</span></div>
+      <div class="theme-item theme10" onclick="setTheme('theme10')"><div class="theme-preview"></div><span>Sunset Crystal</span></div>
+      <div class="theme-item theme11" onclick="setTheme('theme11')"><div class="theme-preview"></div><span>Blue Gold</span></div>
+      <div class="theme-item theme12" onclick="setTheme('theme12')"><div class="theme-preview"></div><span>Lava Heat</span></div>
+      <div class="theme-item theme13" onclick="setTheme('theme13')"><div class="theme-preview"></div><span>Forest Dark</span></div>
+      <div class="theme-item theme14" onclick="setTheme('theme14')"><div class="theme-preview"></div><span>Sky Light</span></div>
+      <div class="theme-item theme15" onclick="setTheme('theme15')"><div class="theme-preview"></div><span>Galaxy Mode</span></div>
+    </div>
+    <button class="close-theme" onclick="closeTheme()">❌ Close</button>
+  </div>
+</div>
+
+<div id="coinShop" class="popup">
+  <div class="popup-box">
+    <h3>💰 Buy PC Coins & Diamonds</h3>
+    <button onclick="buyCoins(100)">💰 ₹100 → 1000 🪙 + 100 💎</button>
+    <button onclick="buyCoins(200)">💰 ₹200 → 2200 🪙 + 220 💎</button>
+    <button onclick="buyCoins(500)">💰 ₹500 → 6000 🪙 + 600 💎</button>
+    <button onclick="buyCoins(1000)">💰 ₹1000 → 13000 🪙 + 1300 💎</button>
+    <button onclick="buyCoins(2000)">💰 ₹2000 → 27000 🪙 + 2700 💎</button>
+    <div class="popular-pack">
+      <span class="popular-tag">🔥 MOST POPULAR</span>
+      <button onclick="buyCoins(3000)">💰 ₹3000 → 50000 🪙 + 5000 💎</button>
+    </div>
+    <button onclick="buyCoins(5000)">💰 ₹5000 → 70000 🪙 + 7000 💎</button>
+    <button onclick="buyCoins(10000)">💰 ₹10000 → 150000 🪙 + 15000 💎</button>
+    <button id="closeShopBtn" onclick="closeCoinShop()">❌ Close</button>
+  </div>
+</div>
+
+
+<div id="leaderboardPopup" class="modal" style="display:none;">
+  <div class="modalBox leaderboard-box">
+    <div class="lb-header">
+      <h2>🏆 Global Leaderboard</h2>
+      <button class="close-btn" onclick="closeLeaderboard()">✖</button>
+    </div>
+    <div class="podium-container" id="topThreePodium">
+      <div class="podium-card rank-2" id="rank2Card">
+        <span class="medal">🥈</span>
+        <div class="podium-avatar" id="p2Pic">👤</div>
+        <div class="podium-name" id="p2Name">---</div>
+        <div class="podium-score" id="p2Score">0 Wins</div>
+      </div>
+      <div class="podium-card rank-1" id="rank1Card">
+        <span class="medal">🥇</span>
+        <div class="podium-avatar" id="p1Pic">👤</div>
+        <div class="podium-name" id="p1Name">---</div>
+        <div class="podium-score" id="p1Score">0 Wins</div>
+      </div>
+      <div class="podium-card rank-3" id="rank3Card">
+        <span class="medal">🥉</span>
+        <div class="podium-avatar" id="p3Pic">👤</div>
+        <div class="podium-name" id="p3Name">---</div>
+        <div class="podium-score" id="p3Score">0 Wins</div>
+      </div>
+    </div>
+    <div class="lb-list-container">
+      <div class="lb-list-header">
+        <span>Rank & Player</span>
+        <span>Stats</span>
+      </div>
+      <div class="lb-list" id="leaderboardList">
+        <div class="lb-loading">Loading Rankings... ⏳</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 📝 Create Account Modal Popup -->
+<!-- 📝 Create Account Modal Popup -->
+<div id="registerModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>CREATE ACCOUNT</h3>
+      <span class="close-btn" id="closeRegisterModal" onclick="closeRegisterPopup()">&times;</span>
+    </div>
+    <p class="modal-sub">Set up your ProChess profile</p>
+
+    <form id="registerForm">
+      <div class="input-group">
+        <label>Player Name</label>
+        <input type="text" id="regName" placeholder="Enter your name" required>
+      </div>
+
+      <div class="input-group">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="Enter email" required>
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="regPassword" placeholder="Min 6 characters" minlength="6" required>
+      </div>
+
+      <button type="submit" class="btn-register-submit" id="btnRegSubmit">Create Profile</button>
+    </form>
+  </div>
+</div>
+
+
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="game.js"></script>
+<input type="file" id="profileInput" accept="image/*" hidden>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+</body>
+</html>

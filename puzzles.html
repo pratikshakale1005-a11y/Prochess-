@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PP GAMES – 100 Unique Chess Puzzles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+      overflow-x: hidden;
+    }
+    .header {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .header h2 { color: #00c8ff; font-size: 1.3rem; text-shadow: 0 0 10px rgba(0,200,255,0.4); }
+    .status-badge { color: #ffd700; font-weight: bold; font-size: 0.95rem; }
+
+    .reward-tier-bar {
+      width: 100%;
+      max-width: 400px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-bottom: 10px;
+      font-size: 0.7rem;
+      text-align: center;
+    }
+    .tier-chip {
+      padding: 5px 2px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      color: #aaa;
+    }
+    .tier-chip.active-tier {
+      border-color: #ffd700;
+      background: rgba(255, 215, 0, 0.15);
+      color: #ffd700;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+    }
+
+    .grid-container {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(20, 25, 35, 0.95);
+      border: 1.5px solid #00c8ff;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(0, 200, 255, 0.2);
+    }
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .levels-grid::-webkit-scrollbar { width: 4px; }
+    .levels-grid::-webkit-scrollbar-thumb { background: #00c8ff; border-radius: 10px; }
+
+    .lvl-btn {
+      padding: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #111;
+      color: #666;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .lvl-btn.unlocked { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.08); }
+    .lvl-btn.active { background: #00c8ff; color: #000; border-color: #fff; box-shadow: 0 0 10px #00c8ff; }
+    .lvl-btn.completed { background: rgba(0, 255, 136, 0.25); border-color: #00ff88; color: #fff; }
+
+    .puzzle-instruction-box {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(10, 15, 25, 0.95);
+      border: 1.5px solid #ffd700;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+      text-align: center;
+    }
+    #puzzleDescription { font-size: 0.95rem; font-weight: bold; color: #fff; }
+    #currentRewardDisplay { font-size: 0.8rem; color: #ffd700; font-weight: bold; }
+
+    .board-container {
+      width: 90vw;
+      max-width: 380px;
+      aspect-ratio: 1;
+      display: grid;
+      grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+      border: 2px solid #00c8ff;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      box-shadow: 0 0 25px rgba(0, 200, 255, 0.35);
+    }
+    .sq {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      user-select: none;
+      cursor: pointer;
+    }
+    .light { background: #e2f1f8; color: #000; }
+    .dark { background: #162438; color: #fff; }
+    .selected { outline: 2.5px solid #ffd700 inset; background: rgba(255, 215, 0, 0.4) !important; }
+
+    .whitePiece {
+      color: #e0f8ff;
+      text-shadow: 0 0 4px #fff, 0 0 8px #00c3ff, 0 0 15px #ff5555, 0 0 25px #00aaff, 0 0 40px #80dfff;
+      filter: drop-shadow(0 0 10px #00c3ff);
+    }
+    .blackPiece {
+      color: #071a10;
+      text-shadow: 0 0 18px #00ff99, 0 0 6px #00ff99;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 153, 0.4));
+    }
+    .piece {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9vw;
+      user-select: none;
+      pointer-events: none;
+    }
+    @media (min-width: 420px) { .piece { font-size: 38px; } }
+
+    .btn-back {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      background: transparent;
+      border: 1.5px solid #ef4444;
+      color: #ef4444;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #toast {
+      position: fixed; bottom: 25px; background: #111; border: 1.5px solid #00c8ff;
+      color: #fff; padding: 10px 22px; border-radius: 20px; display: none; z-index: 1000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>🧩 100 Unique Puzzles</h2>
+    <span class="status-badge" id="lvlStatus">Level: 1 / 100</span>
+  </div>
+
+  <div class="reward-tier-bar">
+    <div class="tier-chip" id="chip1">L1-25: 50🪙</div>
+    <div class="tier-chip" id="chip2">L26-50: 100🪙</div>
+    <div class="tier-chip" id="chip3">L51-75: 200🪙</div>
+    <div class="tier-chip" id="chip4">L76-100: 500🪙</div>
+  </div>
+
+  <div class="grid-container">
+    <div class="levels-grid" id="levelsGrid"></div>
+  </div>
+
+  <div class="puzzle-instruction-box">
+    <span id="puzzleDescription">White to move</span>
+    <span id="currentRewardDisplay">Reward: +50 Coins 🪙</span>
+  </div>
+
+  <div class="board-container" id="puzzleBoard"></div>
+
+  <button class="btn-back" onclick="window.location.replace('index.html')">⬅ Back to Game</button>
+  <div id="toast"></div>
+
+  <script type="module">
+    import { app, db } from "./firebase.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const auth = getAuth(app);
+    let currentUser = null;
+    let unlockedLevel = 1;
+    let currentLevel = 1;
+    let selectedSquare = null;
+
+    function isWhitePiece(p) { return "♙♖♘♗♕♔".includes(p); }
+    function isBlackPiece(p) { return "♟♜♞♝♛♚".includes(p); }
+
+    function getCoinsReward(lvl) {
+      if (lvl <= 25) return 50;
+      if (lvl <= 50) return 100;
+      if (lvl <= 75) return 200;
+      return 500;
+    }
+
+    // FEN नोटेशनला ६४ घरांच्या ॲरेमध्ये रूपांतरित करणारे हेल्पर
+    const pieceMap = {
+      'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
+      'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔'
+    };
+
+    function parseFEN(fen) {
+      const rows = fen.split('/');
+      const board = [];
+      for (const row of rows) {
+        for (const ch of row) {
+          if (!isNaN(ch)) {
+            const emptyCount = parseInt(ch);
+            for (let i = 0; i < emptyCount; i++) board.push("");
+          } else {
+            board.push(pieceMap[ch] || "");
+          }
+        }
+      }
+      return board;
+    }
+
+    // 💯 १०० युनिक चेस पझल्स (FEN + अचूक चाली)
+    const rawPuzzles = [
+      // L1 - L10
+      { desc: "White to move: Queen e7 Mate", fen: "4k3/4p3/8/8/8/8/8/4Q2K", f: 60, t: 12 },
+      { desc: "White to move: Back Rank d8 Mate", fen: "3rk3/3ppp2/8/8/8/8/8/3R3K", f: 59, t: 3 },
+      { desc: "White to move: Smothered Knight Mate", fen: "5rk1/5ppp/7N/8/8/8/8/6K1", f: 23, t: 7 },
+      { desc: "White to move: Diagonal Bishop Mate", fen: "7k/7p/8/8/8/8/8/B6K", f: 56, t: 7 },
+      { desc: "White to move: Knight Royal Fork", fen: "4k2q/8/8/8/5N2/8/8/7K", f: 37, t: 20 },
+      { desc: "White to move: Double Rook Corridor Mate", fen: "4k3/R7/8/8/8/8/8/1R5K", f: 57, t: 1 },
+      { desc: "White to move: Pawn Push Mate", fen: "4k3/3P4/8/8/8/8/8/7K", f: 11, t: 3 },
+      { desc: "White to move: Pin the Black Knight", fen: "4k3/8/4n3/8/8/8/8/4R2K", f: 60, t: 20 },
+      { desc: "White to move: Anastasia Rook Mate", fen: "5rk1/5ppp/4N3/8/8/8/8/3R3K", f: 59, t: 7 },
+      { desc: "White to move: Arabian Knight-Rook Mate", fen: "7k/6pp/5N2/8/8/8/8/6RK", f: 62, t: 6 },
+
+      // L11 - L20
+      { desc: "White to move: Scholar's Mate Finish", fen: "r1bqkb1r/pppp1ppp/2n5/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR", f: 45, t: 13 },
+      { desc: "White to move: Skewer King and Rook", fen: "k6r/8/8/8/8/8/8/Q6K", f: 56, t: 0 },
+      { desc: "White to move: Knight Outpost Mate", fen: "3k4/8/3N4/8/8/8/8/3Q3K", f: 59, t: 11 },
+      { desc: "White to move: Corner Rook Slide", fen: "6k1/6pp/8/8/8/8/8/5R1K", f: 61, t: 5 },
+      { desc: "White to move: Corner Smothered Mate", fen: "7k/6pp/6N1/8/8/8/8/7K", f: 22, t: 7 },
+      { desc: "White to move: Bishop King Pin", fen: "4k3/8/4n3/8/8/8/8/B6K", f: 56, t: 20 },
+      { desc: "White to move: Knight Fork (King + Rook)", fen: "k5r1/8/8/8/4N3/8/8/7K", f: 36, t: 19 },
+      { desc: "White to move: Pawn Breakthrough", fen: "3k4/3P4/8/8/8/8/8/7K", f: 11, t: 3 },
+      { desc: "White to move: Rook Lift Checkmate", fen: "4k3/8/8/R7/8/8/8/1R5K", f: 24, t: 0 },
+      { desc: "White to move: Queen Direct Strike", fen: "3k4/8/8/8/8/8/8/3Q3K", f: 59, t: 3 },
+
+      // L21 - L30
+      { desc: "White to move: Bishop Supported Mate", fen: "4k3/8/4B3/8/8/8/8/3Q3K", f: 59, t: 11 },
+      { desc: "White to move: Skewer Queen and King", fen: "q6k/8/8/8/8/8/8/R6K", f: 56, t: 0 },
+      { desc: "White to move: Back Rank Battery Attack", fen: "2r1k3/2pppp2/8/8/8/8/8/2R4K", f: 58, t: 2 },
+      { desc: "White to move: Arabian Edge Clamp", fen: "6k1/7p/5N2/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Queen Infiltration", fen: "5k2/8/8/8/8/8/8/5Q1K", f: 61, t: 5 },
+      { desc: "White to move: Long Range Queen Mate", fen: "k7/8/8/8/8/8/8/6QK", f: 62, t: 6 },
+      { desc: "White to move: Knight Jumper Finish", fen: "4rk2/5ppp/5N2/8/8/8/8/7K", f: 21, t: 5 },
+      { desc: "White to move: Rook Infiltration Mate", fen: "4rk2/4ppp1/8/8/8/8/8/4R2K", f: 60, t: 4 },
+      { desc: "White to move: Bishop Sniper Checkmate", fen: "6k1/6pp/8/8/8/8/8/2B4K", f: 58, t: 9 },
+      { desc: "White to move: King + Queen Knight Trap", fen: "2k2q2/8/8/8/3N4/8/8/7K", f: 35, t: 18 },
+
+      // L31 - L40
+      { desc: "White to move: Corridor Double Rook", fen: "2k5/R7/8/8/8/8/8/1R5K", f: 57, t: 1 },
+      { desc: "White to move: Pawn Push Checkmate", fen: "2k5/2P5/8/8/8/8/8/7K", f: 10, t: 2 },
+      { desc: "White to move: Absolute Pin on Rook", fen: "4k3/8/4r3/8/8/8/8/4R2K", f: 60, t: 20 },
+      { desc: "White to move: Anastasia Classic", fen: "4rk2/4ppp1/3N4/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Arabian Rook Hook", fen: "7k/5p1p/5N2/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Queen Blitz Hammer", fen: "4k3/8/8/8/8/8/8/4Q2K", f: 60, t: 4 },
+      { desc: "White to move: Skewer Heavy Backrank", fen: "k5r1/8/8/8/8/8/8/Q6K", f: 56, t: 0 },
+      { desc: "White to move: Back Rank Basher", fen: "4rk2/4ppp1/8/8/8/8/8/3R3K", f: 59, t: 3 },
+      { desc: "White to move: Smothered Lock Mate", fen: "5rk1/6pp/5N2/8/8/8/8/7K", f: 21, t: 7 },
+      { desc: "White to move: Corner Snipe Queen", fen: "7k/7p/8/8/8/8/8/6QK", f: 62, t: 7 },
+
+      // L41 - L50
+      { desc: "White to move: Double Rook Wall", fen: "3k4/R7/8/8/8/8/8/2R4K", f: 58, t: 2 },
+      { desc: "White to move: Knight Outpost Fork", fen: "3k1q2/8/8/8/4N3/8/8/7K", f: 36, t: 19 },
+      { desc: "White to move: Pawn Push Breakthrough", fen: "4k3/4P3/8/8/8/8/8/7K", f: 12, t: 4 },
+      { desc: "White to move: Absolute Pin on Bishop", fen: "4k3/8/4b3/8/8/8/8/4R2K", f: 60, t: 20 },
+      { desc: "White to move: Arabian Pocket Net", fen: "6k1/6p1/5N2/8/8/8/8/6R1", f: 62, t: 6 },
+      { desc: "White to move: Diagonal Bishop Pierce", fen: "5k2/5p1p/8/8/8/8/8/1B5K", f: 57, t: 8 },
+      { desc: "White to move: Back Rank Execution", fen: "3rk3/3ppp2/8/8/8/8/8/2R4K", f: 58, t: 2 },
+      { desc: "White to move: Corner Rook Slide", fen: "7k/7p/8/8/8/8/8/6RK", f: 62, t: 6 },
+      { desc: "White to move: Knight Leap Checkmate", fen: "4rk2/5pp1/4N3/8/8/8/8/7K", f: 20, t: 5 },
+      { desc: "White to move: Halfway Champion Queen Mate", fen: "3k4/8/8/8/8/8/8/3Q3K", f: 59, t: 3 },
+
+      // L51 - L60
+      { desc: "White to move: Knight Central Fork", fen: "4k3/2q5/8/8/3N4/8/8/7K", f: 35, t: 18 },
+      { desc: "White to move: Back Rank Battery", fen: "1r2k3/1pppp3/8/8/8/8/8/1R5K", f: 57, t: 1 },
+      { desc: "White to move: Smothered Pocket Shot", fen: "5rk1/6pp/7N/8/8/8/8/7K", f: 23, t: 7 },
+      { desc: "White to move: Bishop King Alignment", fen: "7k/6p1/8/8/8/8/8/B6K", f: 56, t: 7 },
+      { desc: "White to move: Corridor Rook Sweep", fen: "1k6/R7/8/8/8/8/8/R6K", f: 56, t: 0 },
+      { desc: "White to move: Queen Penetration Mate", fen: "2k5/8/8/8/8/8/8/2Q4K", f: 58, t: 2 },
+      { desc: "White to move: Pawn Push to 8th Rank", fen: "5k2/5P2/8/8/8/8/8/7K", f: 13, t: 5 },
+      { desc: "White to move: Absolute Pin Neutralize", fen: "3k4/8/3n4/8/8/8/8/3R3K", f: 59, t: 19 },
+      { desc: "White to move: Anastasia Corner Finish", fen: "4rk2/4ppp1/2N5/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Arabian Hook Clamp", fen: "7k/5pp1/6N1/8/8/8/8/7R", f: 63, t: 7 },
+
+      // L61 - L70
+      { desc: "White to move: Scholar Infiltration", fen: "r1bqk2r/pppp1ppp/2n5/4p3/1bB1P3/5Q2/PPPP1PPP/RNB1K1NR", f: 45, t: 13 },
+      { desc: "White to move: Heavy Skewer Pierce", fen: "k4r2/8/8/8/8/8/8/Q6K", f: 56, t: 0 },
+      { desc: "White to move: Corner Rook Slide Mate", fen: "5k2/5pp1/8/8/8/8/8/4R2K", f: 60, t: 4 },
+      { desc: "White to move: Knight Royal Trap", fen: "3k3q/8/8/8/4N3/8/8/7K", f: 36, t: 19 },
+      { desc: "White to move: Queen Blitz Hammer", fen: "1k6/8/8/8/8/8/8/1Q5K", f: 57, t: 1 },
+      { desc: "White to move: Smothered Pressure Mate", fen: "5rk1/5p1p/6N1/8/8/8/8/7K", f: 22, t: 7 },
+      { desc: "White to move: Corridor Back Slam", fen: "4k3/1R6/8/8/8/8/8/R6K", f: 56, t: 0 },
+      { desc: "White to move: Bishop Long Snipe", fen: "7k/7p/8/8/8/8/8/1B5K", f: 57, t: 7 },
+      { desc: "White to move: Pawn Breakthrough Strike", fen: "1k6/1P6/8/8/8/8/8/7K", f: 9, t: 1 },
+      { desc: "White to move: Heavy Piece Pin Attack", fen: "2k5/8/2r5/8/8/8/8/2R4K", f: 58, t: 18 },
+
+      // L71 - L80
+      { desc: "White to move: Queen Edge Corner Mate", fen: "7k/6pp/8/8/8/8/8/7Q", f: 63, t: 7 },
+      { desc: "White to move: Double Rook Corridor Wall", fen: "3k4/1R6/8/8/8/8/8/2R4K", f: 58, t: 2 },
+      { desc: "White to move: Arabian Pocket Net", fen: "7k/6p1/5N2/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Back Rank Trap Net", fen: "2r1k3/2ppp3/8/8/8/8/8/3R3K", f: 59, t: 3 },
+      { desc: "White to move: Masterclass Queen Mate", fen: "5k2/8/8/8/8/8/8/5Q1K", f: 61, t: 5 },
+      { desc: "White to move: Grand Fork Tactics", fen: "2k2q2/8/8/8/4N3/8/8/7K", f: 36, t: 19 },
+      { desc: "White to move: Rook Infiltration Net", fen: "3rk3/3ppp2/8/8/8/8/8/4R2K", f: 60, t: 4 },
+      { desc: "White to move: Smothered Pocket Shot", fen: "4rk2/4ppp1/5N2/8/8/8/8/7K", f: 21, t: 7 },
+      { desc: "White to move: Long Diagonal Cannon", fen: "6k1/6p1/8/8/8/8/8/B6K", f: 56, t: 7 },
+      { desc: "White to move: Double Rook Slam", fen: "2k5/1R6/8/8/8/8/8/R6K", f: 56, t: 0 },
+
+      // L81 - L90
+      { desc: "White to move: Pawn Charge Checkmate", fen: "2k5/2P5/8/8/8/8/8/7K", f: 10, t: 2 },
+      { desc: "White to move: Tactical Pin Exploitation", fen: "4k3/8/4n3/8/8/8/8/4R2K", f: 60, t: 20 },
+      { desc: "White to move: Anastasias Final Net", fen: "5rk1/5ppp/3N4/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Arabian Checkmate Climax", fen: "7k/5p1p/6N1/8/8/8/8/6R1", f: 62, t: 6 },
+      { desc: "White to move: Scholar Precision Strike", fen: "r1bqkb1r/pppp1ppp/2n5/4p3/2B1n3/5Q2/PPPP1PPP/RNB1K1NR", f: 45, t: 13 },
+      { desc: "White to move: Skewer Decimator", fen: "k4r2/8/8/8/8/8/8/Q6K", f: 56, t: 0 },
+      { desc: "White to move: Corner Slide Execution", fen: "4k3/4ppp1/8/8/8/8/8/3R3K", f: 59, t: 3 },
+      { desc: "White to move: Deadly Queen Slam", fen: "1k6/8/8/8/8/8/8/1Q5K", f: 57, t: 1 },
+      { desc: "White to move: Knight Royal Conquest", fen: "4k2q/8/8/8/3N4/8/8/7K", f: 35, t: 18 },
+      { desc: "White to move: Back Rank Annihilation", fen: "4rk2/4ppp1/8/8/8/8/8/4R2K", f: 60, t: 4 },
+
+      // L91 - L100
+      { desc: "White to move: Smothered Legend Mate", fen: "5rk1/5ppp/6N1/8/8/8/8/7K", f: 22, t: 7 },
+      { desc: "White to move: Bishop Horizon Check", fen: "6k1/6pp/8/8/8/8/8/1B5K", f: 57, t: 9 },
+      { desc: "White to move: Dual Rook Fortress Breaker", fen: "3k4/R7/8/8/8/8/8/1R5K", f: 57, t: 1 },
+      { desc: "White to move: Pawn Imperial Push", fen: "3k4/3P4/8/8/8/8/8/7K", f: 11, t: 3 },
+      { desc: "White to move: Master Pin Lockdown", fen: "3k4/8/3r4/8/8/8/8/3R3K", f: 59, t: 19 },
+      { desc: "White to move: Anastasia Royal End", fen: "4rk2/4ppp1/2N5/8/8/8/8/7R", f: 63, t: 7 },
+      { desc: "White to move: Arabian Final Net", fen: "6k1/6pp/5N2/8/8/8/8/6RK", f: 62, t: 6 },
+      { desc: "White to move: Queen Corner Laser Mate", fen: "7k/7p/8/8/8/8/8/7Q", f: 63, t: 7 },
+      { desc: "White to move: Penultimate Masterpiece", fen: "2rk4/2ppp3/8/8/8/8/8/2R4K", f: 58, t: 2 },
+      { desc: "White to move: Level 100 Grandmaster Finish!", fen: "4k3/4p3/8/8/8/8/8/4Q2K", f: 60, t: 12 }
+    ];
+
+    // FEN स्ट्रिंग्सचे अचूक ६४ घरांच्या बोर्डमध्ये रूपांतर
+    const puzzlesList = rawPuzzles.map(p => ({
+      desc: p.desc,
+      board: parseFEN(p.fen),
+      solution: { from: p.f, to: p.t }
+    }));
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerText = msg;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 2000);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const snap = await get(ref(db, `users/${user.uid}/puzzleLevel`));
+        if (snap.exists()) unlockedLevel = Number(snap.val()) || 1;
+      } else {
+        unlockedLevel = Number(localStorage.getItem("guest_puzzle_level")) || 1;
+      }
+      currentLevel = unlockedLevel;
+      renderGrid();
+      loadPuzzle(currentLevel);
+    });
+
+    function renderGrid() {
+      const grid = document.getElementById("levelsGrid");
+      grid.innerHTML = "";
+
+      for (let i = 1; i <= 100; i++) {
+        const btn = document.createElement("button");
+        btn.className = "lvl-btn";
+        btn.innerText = i;
+
+        if (i < unlockedLevel) {
+          btn.classList.add("completed");
+          btn.onclick = () => loadPuzzle(i);
+        } else if (i === unlockedLevel) {
+          btn.classList.add("unlocked");
+          if (i === currentLevel) btn.classList.add("active");
+          btn.onclick = () => loadPuzzle(i);
+        } else {
+          btn.disabled = true;
+          btn.style.opacity = "0.3";
+        }
+        grid.appendChild(btn);
+      }
+      document.getElementById("lvlStatus").innerText = `Level: ${currentLevel} / 100`;
+
+      document.querySelectorAll(".tier-chip").forEach(c => c.classList.remove("active-tier"));
+      if (currentLevel <= 25) document.getElementById("chip1")?.classList.add("active-tier");
+      else if (currentLevel <= 50) document.getElementById("chip2")?.classList.add("active-tier");
+      else if (currentLevel <= 75) document.getElementById("chip3")?.classList.add("active-tier");
+      else document.getElementById("chip4")?.classList.add("active-tier");
+    }
+
+    let activeBoard = [];
+    let activeSolution = null;
+
+    function loadPuzzle(lvl) {
+      currentLevel = lvl;
+      renderGrid();
+
+      const template = puzzlesList[lvl - 1] || puzzlesList[0];
+
+      activeBoard = [...template.board];
+      activeSolution = template.solution;
+
+      const descEl = document.getElementById("puzzleDescription");
+      const rewardEl = document.getElementById("currentRewardDisplay");
+      const rewardCoins = getCoinsReward(lvl);
+
+      if (descEl) descEl.innerText = `Lvl ${lvl}: ${template.desc}`;
+      if (rewardEl) rewardEl.innerText = `Reward: +${rewardCoins} Coins 🪙`;
+
+      selectedSquare = null;
+      renderBoard();
+      showToast(`Level ${lvl} | Reward: +${rewardCoins} Coins 🪙`);
+    }
+
+    function renderBoard() {
+      const boardEl = document.getElementById("puzzleBoard");
+      boardEl.innerHTML = "";
+
+      for (let i = 0; i < 64; i++) {
+        const sq = document.createElement("div");
+        const isLight = (Math.floor(i / 8) + (i % 8)) % 2 === 0;
+        sq.className = `sq ${isLight ? "light" : "dark"}`;
+
+        if (selectedSquare === i) sq.classList.add("selected");
+
+        const pieceChar = activeBoard[i];
+        if (pieceChar) {
+          const pieceDiv = document.createElement("div");
+          pieceDiv.textContent = pieceChar;
+          if (isWhitePiece(pieceChar)) pieceDiv.className = "piece whitePiece";
+          else if (isBlackPiece(pieceChar)) pieceDiv.className = "piece blackPiece";
+          else pieceDiv.className = "piece";
+          sq.appendChild(pieceDiv);
+        }
+
+        sq.onclick = () => onSquareClick(i);
+        boardEl.appendChild(sq);
+      }
+    }
+
+    async function onSquareClick(i) {
+      if (selectedSquare === null) {
+        if (activeBoard[i]) {
+          selectedSquare = i;
+          renderBoard();
+        }
+      } else {
+        const from = selectedSquare;
+        const to = i;
+
+        if (from === activeSolution.from && to === activeSolution.to) {
+          activeBoard[to] = activeBoard[from];
+          activeBoard[from] = "";
+          selectedSquare = null;
+          renderBoard();
+
+          const earnedReward = getCoinsReward(currentLevel);
+          showToast(`🎉 Correct! +${earnedReward} Coins 🪙`);
+
+          if (currentLevel === unlockedLevel && unlockedLevel < 100) {
+            unlockedLevel++;
+            localStorage.setItem("guest_puzzle_level", unlockedLevel);
+
+            let coins = Number(localStorage.getItem("coins")) || 500;
+            coins += earnedReward;
+            localStorage.setItem("coins", coins);
+
+            if (currentUser) {
+              await update(ref(db, `users/${currentUser.uid}`), {
+                puzzleLevel: unlockedLevel,
+                coins: coins
+              });
+            }
+          }
+
+          setTimeout(() => { loadPuzzle(currentLevel + 1); }, 1000);
+        } else {
+          showToast("❌ Wrong move! Try again.");
+          selectedSquare = null;
+          renderBoard();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

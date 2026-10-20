@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PP GAMES – Rewards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .reward-container {
+      background: rgba(20, 25, 35, 0.95);
+      border: 2px solid #ffd700;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header h2 {
+      color: #ffd700;
+      font-size: 1.3rem;
+    }
+    .user-balance {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 15px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      border: 1px solid #333;
+    }
+    .streak-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .streak-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    .streak-card.grand {
+      grid-column: span 3;
+      background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(0, 200, 255, 0.15));
+      border: 1px solid #ffd700;
+    }
+    .streak-card.claimed {
+      opacity: 0.4;
+      filter: grayscale(1);
+      border-color: #444;
+    }
+    .streak-card.active-today {
+      border-color: #00ff88;
+      background: rgba(0, 255, 136, 0.15);
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+      transform: scale(1.05);
+    }
+    .day-title {
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+    .reward-icon {
+      font-size: 1.5rem;
+      margin: 4px 0;
+    }
+    .reward-val {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #ffd700;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    .btn-claim {
+      background: linear-gradient(45deg, #ffd700, #ff9900);
+      color: #000;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      margin-bottom: 20px;
+    }
+    .btn-claim:disabled {
+      background: #555;
+      color: #888;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .redeem-box {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 15px;
+      margin-bottom: 20px;
+    }
+    .redeem-box h3 {
+      font-size: 0.95rem;
+      color: #00c8ff;
+      margin-bottom: 10px;
+    }
+    .redeem-row {
+      display: flex;
+      gap: 8px;
+    }
+    .redeem-row input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      outline: none;
+    }
+    .btn-redeem {
+      background: #00c8ff;
+      color: #000;
+      width: auto;
+      padding: 0 15px;
+    }
+    .btn-back {
+      background: transparent;
+      border: 1px solid #e74c3c;
+      color: #e74c3c;
+    }
+    .btn-back:hover {
+      background: #e74c3c;
+      color: #fff;
+    }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      background: #222;
+      border: 1px solid #ffd700;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      display: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reward-container">
+  <div class="header">
+    <h2>🎁 Daily Rewards</h2>
+    <span id="playerDisplay">Loading...</span>
+  </div>
+
+  <div class="user-balance">
+    <span>🪙 <b id="coinBal">0</b> Coins</span>
+    <span>💎 <b id="diamondBal">0</b> Diamonds</span>
+  </div>
+
+  <div class="streak-grid">
+    <div class="streak-card" id="day1"><span class="day-title">Day 1</span><div class="reward-icon">🪙</div><span class="reward-val">+50</span></div>
+    <div class="streak-card" id="day2"><span class="day-title">Day 2</span><div class="reward-icon">🪙</div><span class="reward-val">+100</span></div>
+    <div class="streak-card" id="day3"><span class="day-title">Day 3</span><div class="reward-icon">🪙</div><span class="reward-val">+150</span></div>
+    <div class="streak-card" id="day4"><span class="day-title">Day 4</span><div class="reward-icon">🪙</div><span class="reward-val">+200</span></div>
+    <div class="streak-card" id="day5"><span class="day-title">Day 5</span><div class="reward-icon">🪙</div><span class="reward-val">+250</span></div>
+    <div class="streak-card" id="day6"><span class="day-title">Day 6</span><div class="reward-icon">🪙</div><span class="reward-val">+300</span></div>
+    <div class="streak-card grand" id="day7"><span class="day-title">Day 7 🔥 Grand Reward</span><div class="reward-icon">🪙💎</div><span class="reward-val">+500 & 2💎</span></div>
+  </div>
+
+  <button id="claimBtn" class="btn btn-claim" onclick="claimDailyReward()">🎁 Claim Today's Reward</button>
+
+  <div class="redeem-box">
+    <h3>🎟️ Have a Promo Code?</h3>
+    <div class="redeem-row">
+      <input type="text" id="couponInput" placeholder="Enter Gift Code...">
+      <button class="btn btn-redeem" onclick="redeemGift()">Redeem</button>
+    </div>
+  </div>
+
+  <button class="btn btn-back" onclick="window.location.replace('index.html')">⬅ Back to Game</button>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+  import { app, db, getRealServerTime } from "./firebase.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  const auth = getAuth(app);
+  let currentUser = null;
+  let userData = null;
+
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+  function showMessage(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 2500);
+  }
+
+  // Auth State Listener
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      document.getElementById("playerDisplay").innerText = user.displayName || ("ID: " + (user.uid.substring(0, 5).toUpperCase()));
+      await fetchUserData();
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+
+  async function fetchUserData() {
+    if (!currentUser) return;
+    const snap = await get(ref(db, "users/" + currentUser.uid));
+    if (snap.exists()) {
+      userData = snap.val();
+      updateUI();
+    }
+  }
+
+  function updateUI() {
+    const coins = userData.coins || 0;
+    const diamonds = userData.diamonds || 0;
+    document.getElementById("coinBal").innerText = coins;
+    document.getElementById("diamondBal").innerText = diamonds;
+
+    localStorage.setItem("coins", coins);
+    localStorage.setItem("diamonds", diamonds);
+
+    const now = getRealServerTime();
+    const lastClaim = userData.lastClaimTimestamp || 0;
+    const timeSinceLastClaim = now - lastClaim;
+    const isClaimedToday = (lastClaim > 0 && timeSinceLastClaim < ONE_DAY_MS);
+
+    let currentStreak = userData.loginStreak || 0;
+
+    // 48 ghante se jyada gap hone par streak reset
+    if (lastClaim > 0 && timeSinceLastClaim > (ONE_DAY_MS * 2)) {
+      currentStreak = 0;
+    }
+
+    const nextRewardDay = isClaimedToday ? currentStreak : (currentStreak % 7) + 1;
+
+    for (let i = 1; i <= 7; i++) {
+      const card = document.getElementById("day" + i);
+      card.classList.remove("claimed", "active-today");
+
+      if (isClaimedToday && i <= currentStreak) {
+        card.classList.add("claimed");
+      } else if (!isClaimedToday && i < nextRewardDay) {
+        card.classList.add("claimed");
+      } else if (!isClaimedToday && i === nextRewardDay) {
+        card.classList.add("active-today");
+      }
+    }
+
+    const btn = document.getElementById("claimBtn");
+    if (isClaimedToday) {
+      const remainingHours = Math.ceil((ONE_DAY_MS - timeSinceLastClaim) / (1000 * 60 * 60));
+      btn.innerText = `✔ Claimed (${remainingHours}h remaining)`;
+      btn.disabled = true;
+    } else {
+      btn.innerText = `🎁 Claim Day ${nextRewardDay} Reward`;
+      btn.disabled = false;
+    }
+  }
+
+  // 🎁 1. Server Time Verified Daily Reward Claim
+  window.claimDailyReward = async function () {
+    if (!currentUser || !userData) return;
+
+    const now = getRealServerTime();
+    const lastClaim = userData.lastClaimTimestamp || 0;
+    const timeSinceLastClaim = now - lastClaim;
+
+    if (lastClaim > 0 && timeSinceLastClaim < ONE_DAY_MS) {
+      const remainingHours = Math.ceil((ONE_DAY_MS - timeSinceLastClaim) / (1000 * 60 * 60));
+      showMessage(`❌ Kripya ${remainingHours} ghante baad aaiye!`);
+      return;
+    }
+
+    let streak = userData.loginStreak || 0;
+    if (lastClaim > 0 && timeSinceLastClaim <= (ONE_DAY_MS * 2)) {
+      streak += 1;
+    } else {
+      streak = 1;
+    }
+
+    if (streak > 7) streak = 1;
+
+    let addC = streak * 50;
+    let addD = 0;
+
+    if (streak === 7) {
+      addC = 500;
+      addD = 2;
+    }
+
+    const newCoins = (userData.coins || 0) + addC;
+    const newDiamonds = (userData.diamonds || 0) + addD;
+
+    await update(ref(db, "users/" + currentUser.uid), {
+      coins: newCoins,
+      diamonds: newDiamonds,
+      loginStreak: streak,
+      lastClaimTimestamp: now
+    });
+
+    showMessage(`🎉 Day ${streak} Reward Claimed! +${addC} 🪙 ${addD > 0 ? `& +${addD} 💎` : ""}`);
+    await fetchUserData();
+  };
+
+  // 🎟️ 2. Promo Code Redeem
+  window.redeemGift = async function () {
+    if (!currentUser) return;
+    const code = document.getElementById("couponInput").value.trim().toUpperCase();
+    if (!code) {
+      showMessage("Kripya code enter karein!");
+      return;
+    }
+
+    const userClaimRef = ref(db, `users/${currentUser.uid}/claimedCodes/${code}`);
+    const claimSnap = await get(userClaimRef);
+
+    if (claimSnap.exists()) {
+      showMessage("❌ Ye code aap pehle use kar chuke hain!");
+      return;
+    }
+
+    const codeSnap = await get(ref(db, "promoCodes/" + code));
+    if (codeSnap.exists() && codeSnap.val().active) {
+      const p = codeSnap.val();
+      const giftC = p.coins || 0;
+      const giftD = p.diamonds || 0;
+
+      const newCoins = (userData.coins || 0) + giftC;
+      const newDiamonds = (userData.diamonds || 0) + giftD;
+
+      await update(ref(db, "users/" + currentUser.uid), {
+        coins: newCoins,
+        diamonds: newDiamonds
+      });
+
+      await set(userClaimRef, true);
+      document.getElementById("couponInput").value = "";
+      showMessage(`🎁 Success! +${giftC} 🪙 ${giftD > 0 ? `+${giftD} 💎` : ""}`);
+      await fetchUserData();
+    } else {
+      showMessage("❌ Invalid ya expired code!");
+    }
+  };
+</script>
+
+</body>
+</html>

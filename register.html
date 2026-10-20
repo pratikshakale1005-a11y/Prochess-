@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PP GAMES – Create Account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: radial-gradient(circle at center, #101c30 0%, #060912 75%, #000000 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .register-card {
+      width: 100%;
+      max-width: 380px;
+      background: linear-gradient(145deg, #0d1524, #080d17);
+      border: 1.8px solid #00ff88;
+      border-radius: 22px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 0 35px rgba(0, 255, 136, 0.25), inset 0 0 15px rgba(0, 255, 136, 0.05);
+    }
+    .register-card h2 {
+      color: #00ff88;
+      font-size: 1.4rem;
+      letter-spacing: 1.2px;
+      margin-bottom: 4px;
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+    }
+    .register-card p {
+      color: #8892b0;
+      font-size: 0.8rem;
+      margin-bottom: 18px;
+    }
+    .input-group {
+      text-align: left;
+      margin-bottom: 12px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: #00c8ff;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #101826;
+      border: 1.5px solid #1f2d42;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: #00ff88;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+    }
+    .input-group select option {
+      background: #0d1524;
+      color: #fff;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #00ff88 0%, #00bd65 100%);
+      border: none;
+      border-radius: 12px;
+      color: #05140b;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 0 18px rgba(0, 255, 136, 0.35);
+      transition: transform 0.15s ease;
+    }
+    .btn-submit:active { transform: scale(0.96); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .back-link {
+      display: inline-block;
+      margin-top: 15px;
+      color: #ff4757;
+      font-size: 0.85rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    #toast {
+      position: fixed;
+      bottom: 25px;
+      background: #111;
+      border: 1.5px solid #00ff88;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      display: none;
+      font-weight: bold;
+      z-index: 9999;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+      font-size: 0.85rem;
+      text-align: center;
+      max-width: 90%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-card">
+    <h2>CREATE ACCOUNT</h2>
+    <p>Set up your ProChess profile</p>
+
+    <form id="regForm">
+      <!-- 1. Name -->
+      <div class="input-group">
+        <label>Player Name *</label>
+        <input type="text" id="regName" placeholder="Enter full name" required>
+      </div>
+
+      <!-- 2. Country -->
+      <div class="input-group">
+        <label>Country *</label>
+        <select id="regCountry" required>
+          <option value="🇮🇳 India" data-code="+91">🇮🇳 India (+91)</option>
+          <option value="🇺🇸 USA" data-code="+1">🇺🇸 USA (+1)</option>
+          <option value="🇬🇧 UK" data-code="+44">🇬🇧 UK (+44)</option>
+          <option value="🇷🇺 Russia" data-code="+7">🇷🇺 Russia (+7)</option>
+          <option value="🇦🇺 Australia" data-code="+61">🇦🇺 Australia (+61)</option>
+          <option value="🇨🇦 Canada" data-code="+1">🇨🇦 Canada (+1)</option>
+          <option value="🇦🇪 UAE" data-code="+971">🇦🇪 UAE (+971)</option>
+          <option value="🇩🇪 Germany" data-code="+49">🇩🇪 Germany (+49)</option>
+        </select>
+      </div>
+
+      <!-- 3. Email (Only Valid Domains) -->
+      <div class="input-group">
+        <label>Email Address *</label>
+        <input type="email" id="regEmail" placeholder="example@gmail.com" required>
+      </div>
+
+      <!-- 4. Phone Number (Optional & Numbers Only) -->
+      <div class="input-group">
+        <label>Phone Number (Optional)</label>
+        <input type="tel" id="regPhone" placeholder="Digits only" pattern="[0-9]{7,15}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      </div>
+
+      <!-- 5. Date of Birth (18+ Mandatory) -->
+      <div class="input-group">
+        <label>Date of Birth (18+ Required) *</label>
+        <input type="date" id="regDob" required>
+      </div>
+
+      <!-- 6. Promo Code -->
+      <div class="input-group">
+        <label>Referral / Promo Code (Optional)</label>
+        <input type="text" id="regPromo" placeholder="Enter friend's code">
+      </div>
+
+      <!-- 7. Password -->
+      <div class="input-group">
+        <label>Password (Min 6 Characters) *</label>
+        <input type="password" id="regPassword" placeholder="Enter password" minlength="6" required>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">Create Profile</button>
+    </form>
+
+    <a href="index.html" class="back-link">⬅ Back to Login</a>
+  </div>
+
+  <div id="toast"></div>
+
+  <script type="module">
+    import { app, db } from "./firebase.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      updateProfile 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const auth = getAuth(app);
+    const form = document.getElementById("regForm");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const toast = document.getElementById("toast");
+    const dobInput = document.getElementById("regDob");
+
+    // १८ वर्षे पूर्ण असण्याची कमाल तारीख आपोआप सेट करणे
+    const today = new Date();
+    const maxYear = today.getFullYear() - 18;
+    const maxMonth = String(today.getMonth() + 1).padStart(2, '0');
+    const maxDay = String(today.getDate()).padStart(2, '0');
+    dobInput.max = `${maxYear}-${maxMonth}-${maxDay}`;
+
+    function showMsg(msg) {
+      toast.innerText = msg;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 3000);
+    }
+
+    // व्हॅलिड ओरिजिनल ईमेल डोमेन तपासणी
+    function isValidEmailDomain(email) {
+      const allowedDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "rediffmail.com"];
+      const domain = email.split('@')[1]?.toLowerCase();
+      return allowedDomains.includes(domain);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("regName").value.trim();
+      const country = document.getElementById("regCountry").value;
+      const email = document.getElementById("regEmail").value.trim();
+      const phone = document.getElementById("regPhone").value.trim();
+      const dob = document.getElementById("regDob").value;
+      const promoInput = document.getElementById("regPromo").value.trim().toUpperCase();
+      const password = document.getElementById("regPassword").value;
+
+      // ईमेल डोमेन व्हॅलिडेशन
+      if (!isValidEmailDomain(email)) {
+        showMsg("❌ Only genuine emails (Gmail, Yahoo, Outlook, iCloud) are allowed!");
+        return;
+      }
+
+      // १८ वर्षे पूर्ण व्हॅलिडेशन
+      const birthDate = new Date(dob);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (age < 18) {
+        showMsg("❌ You must be at least 18 years old to register!");
+        return;
+      }
+
+      btnSubmit.innerText = "Creating Profile... ⏳";
+      btnSubmit.disabled = true;
+
+      try {
+        // १. Firebase Auth मध्ये युझर तयार करणे
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await updateProfile(user, { displayName: name });
+
+        // युझरचा स्वतःचा युनिक रेफरल कोड तयार करणे
+        const myReferralCode = "PC-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+
+        let initialCoins = 500;
+
+        // २. प्रोमो कोड वापरला असल्यास तपासणी आणि बोनस कॉइन्स
+        if (promoInput) {
+          const usersSnap = await get(ref(db, "users"));
+          if (usersSnap.exists()) {
+            const allUsers = usersSnap.val();
+            let referrerUid = null;
+            for (let uid in allUsers) {
+              if (allUsers[uid].referralCode === promoInput) {
+                referrerUid = uid;
+                break;
+              }
+            }
+
+            if (referrerUid) {
+              initialCoins += 250; // नवीन युझरला २५० कॉइन्स बोनस
+              const refCoins = (allUsers[referrerUid].coins || 0) + 250;
+              await update(ref(db, `users/${referrerUid}`), { coins: refCoins }); // मित्राला २५० कॉइन्स
+            }
+          }
+        }
+
+        // ३. Realtime Database मध्ये संपूर्ण प्रोफाइल डेटा सेव्ह करणे
+        await set(ref(db, "users/" + user.uid), {
+          username: name,
+          country: country,
+          email: email,
+          phone: phone || "",
+          dob: dob,
+          referralCode: myReferralCode,
+          referredBy: promoInput || "",
+          photoURL: "",
+          wins: 0,
+          loss: 0,
+          coins: initialCoins,
+          diamonds: 0,
+          level: 1,
+          xp: 0,
+          totalXP: 0,
+          attack: 10,
+          defense: 10,
+          strategy: 10,
+          speed: 10,
+          accuracy: 10,
+          createdAt: new Date().toISOString()
+        });
+
+        localStorage.setItem("coins", initialCoins);
+        localStorage.setItem("diamonds", 0);
+
+        showMsg("🎉 Account Created Successfully! Redirecting...");
+
+        setTimeout(() => {
+          window.location.replace("index.html");
+        }, 1200);
+
+      } catch (err) {
+        showMsg("❌ " + err.message);
+        btnSubmit.innerText = "Create Profile";
+        btnSubmit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
